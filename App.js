@@ -1,139 +1,87 @@
 import React from 'react';
-import { StyleSheet, Text, View, FlatList, ScrollView } from 'react-native';
-import NavigationBar from 'react-native-navbar';
-import { List, ListItem } from 'react-native-elements'
+import { StyleSheet, Text, View, FlatList } from 'react-native';
+
+import { List, ListItem } from "react-native-elements";
 
 export default class App extends React.Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      loading: false,
+      data: [],
+      error: null,
+      refreshing: false,
+    };
+  }
+
+  componentDidMount() {
+    this.makeRemoteRequestReddit();
+  }
+
+  
+  makeRemoteRequest = () => {
+    const { page, seed } = this.state;
+    const url = `https://randomuser.me/api/?seed=${seed}&page=${page}&results=20`;
+    this.setState({ loading: true });
+    fetch(url)
+      .then(res => res.json())
+      .then(res => {
+        this.setState({
+          data: page === 1 ? res.results : [...this.state.data, ...res.results],
+          error: res.error || null,
+          loading: false,
+          refreshing: false
+        });
+      })
+      .catch(error => {
+        this.setState({ error, loading: false });
+      });
+  };
+  makeRemoteRequestReddit = () => {
+    const url = `https://api.reddit.com/r/programming/new.json`;
+    this.setState({ loading: true });
+    fetch(url)
+      .then(res => res.json())
+      .then(res => {
+        this.setState({
+          data: res.data.children,
+          error: false,
+          loading: false,
+          refreshing: false
+        });
+      })
+      .catch(error => {
+        this.setState({ error, loading: false });
+      });
+  };
+
+  _openUrl(url){
+    console.log(url);
+    console.log('pressed anywhere on list item'); 
+  } 
+
   render() {
     return (
-      <ScrollView>
-      <View style={styles.container}>
-        <NavigationBar
-          title={titleConfig}
-          rightButton={rightButtonConfig}
-        />
+      <List>
+      <FlatList
+        data={this.state.data}
+        renderItem={({ item }) => (
+          <ListItem
+            roundAvatar
+            avatar={{ uri: "https://image.freepik.com/free-icon/reddit-logo_318-67806.jpg" }}
+            title={item.data.title}
+            subtitle={item.data.domain}
+            onPress={() => this._openUrl(item.data.url)}
 
-        <List containerStyle={{ marginBottom: 20 }}>
-          {
-            list.map((l, i) => (
-              <ListItem
-                roundAvatar
-                avatar={{ uri: l.avatar_url }}
-                key={i}
-                title={l.name}
-              />
-            ))
-          }
-        </List>
-      </View>
-      </ScrollView>
-
+          />
+        )}
+         keyExtractor={item => item.data.id}
+      />
+</List>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
-});
-
-const rightButtonConfig = {
-  title: 'Refresh',
-  handler: () => alert('Refresh!'),
-};
-
-const titleConfig = {
-  title: 'Hello, world',
-};
-
-
-const list = [
-  {
-    name: 'Amy Farha',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-    subtitle: 'Vice President'
-  },
-  {
-    name: 'Chris Jackson',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-    subtitle: 'Vice Chairman'
-  },
-  {
-    name: 'Chris Jackson',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-    subtitle: 'Vice Chairman'
-  },
-  {
-    name: 'Chris Jackson',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-    subtitle: 'Vice Chairman'
-  },
-  {
-    name: 'Chris Jackson',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-    subtitle: 'Vice Chairman'
-  },
-  {
-    name: 'Chris Jackson',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-    subtitle: 'Vice Chairman'
-  },
-  {
-    name: 'Chris Jackson',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-    subtitle: 'Vice Chairman'
-  },
-  {
-    name: 'Chris Jackson',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-    subtitle: 'Vice Chairman'
-  },
-  {
-    name: 'Chris Jackson',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-    subtitle: 'Vice Chairman'
-  },
-  {
-    name: 'Chris Jackson',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-    subtitle: 'Vice Chairman'
-  },
-  {
-    name: 'Chris Jackson',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-    subtitle: 'Vice Chairman'
-  },
-  {
-    name: 'Chris Jackson',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-    subtitle: 'Vice Chairman'
-  },
-  {
-    name: 'Chris Jackson',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-    subtitle: 'Vice Chairman'
-  },
-  {
-    name: 'Chris Jackson',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-    subtitle: 'Vice Chairman'
-  },
-  {
-    name: 'Chris Jackson',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-    subtitle: 'Vice Chairman'
-  },
-  {
-    name: 'Chris Jackson',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-    subtitle: 'Vice Chairman'
-  },
-  {
-    name: 'Chris Jacksona',
-    avatar_url: 'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-    subtitle: 'Vice Chairman'
-  }
-];
 
 
